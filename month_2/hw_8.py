@@ -1,29 +1,29 @@
-from abc import ABC, abstractmethod
-from datetime import date
+from abc import ABC, abstractmethod #здесь мы говорим что в этом файле мы будем использовать абстрактные классы и методы
+from datetime import date #здесь мы импортируем модуль date из библиотеки datetime, чтобы работать с датами
 
 
 class LibraryItem(ABC):
     def __init__(self, name):
         self.__name = name  
 
-    @property
+    @property #здесь мы используем декоратор @property, чтобы сделать метод name доступным как атрибут
     def name(self):
         return self.__name
 
-    @name.setter
+    @name.setter #здесь мы используем декоратор @name.setter, чтобы сделать метод name доступным для изменения
     def name(self, new_name):
         if not new_name.strip():
             raise ValueError("Название не может быть пустым")
         print(f"Название изменено с «{self.__name}» на «{new_name}»")
         self.__name = new_name
 
-    @abstractmethod
+    @abstractmethod 
     def get_info(self) -> str:
         pass
 
 
 
-class Book(LibraryItem):
+class Book(LibraryItem):  #наследует от главного класса
     def __init__(self, name, author, year):
         super().__init__(name)
         if not Book.is_valid_year(year):
@@ -85,7 +85,7 @@ class AudioBook(Book):
 class Mixin(JsonExportMixin, AudioBook, Book, LibraryItem):
     pass
 
-def find_book(library, title):
+def find_book(library, title): #здесь мы пишем код для поиска книги в библиотке по названию
     checks = 0
     for book in library:
         checks += 1
@@ -93,7 +93,7 @@ def find_book(library, title):
             return book, checks
     return None, checks
 
-import sqlite3
+import sqlite3 #говорим что мы будем использовать Sqlite
 
 connection = sqlite3.connect("library1.db")
 cursor = connection.cursor()
@@ -106,8 +106,8 @@ cursor.execute("""
         year INTEGER,
         available INTEGER
     )
-""")
-connection.commit()
+""") #тут мы создаем таблицу books, если она не существует, с полями id, name, author, year и available
+connection.commit() #после этого мы сохраняем изменения в базе данных
 
 books = [
     ("The Great Gatsby", "F. Scott Fitzgerald", "1925", "Yes"),
@@ -121,9 +121,9 @@ cursor.executemany(
 )
 
 connection.commit()
+#здесь я использовал быстрый метод добавления записей в таблицу 
 
-
-def add_book():
+def add_book(): #для того что бы добавить книги в так называемую библиотеку
     name = input("Название: ")
     author = input("Автор: ")
     try:
@@ -139,7 +139,7 @@ def add_book():
     print("Книга добавлена")
 
 
-def show_books():
+def show_books(): #фуекция для того что бы показать книги в библиотеке
     cursor.execute("SELECT * FROM books")
     rows = cursor.fetchall()
     if not rows:
@@ -150,8 +150,8 @@ def show_books():
         print(f"{b[0]}. {b[1]} - {b[2]}, {b[3]} ({status})")
 
 
-def update_book():
-    show_books()
+def update_book():#фуекция для того что бы изменить данные о книге
+    show_books() #снчала функция будет показывать весь список книг в бтблиотеке
     try:
         book_id = int(input("id книги для изменения: "))
         name = input("Новое название: ")
@@ -168,7 +168,7 @@ def update_book():
     print("Данные обновлены" if cursor.rowcount else "Книга с таким id не найдена")
 
 
-def delete_book():
+def delete_book(): #фуекция для того что бы удалить книгу из библиотеки
     show_books()
     try:
         book_id = int(input("id книги для удаления: "))
@@ -180,7 +180,7 @@ def delete_book():
     print("Книга удалена" if cursor.rowcount else "Книга с таким id не найдена")
 
 
-while True:
+while True: #так скажем менб программы
     print("\n1. Добавить книгу")
     print("2. Показать все книги")
     print("3. Изменить книгу")
@@ -201,4 +201,4 @@ while True:
     else:
         print("Неверный выбор")
 
-connection.close()
+connection.close() #и закрываем соединение с базой данных в конце программы
